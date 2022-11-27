@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from .database import Base
+from . import schemas
+
 
 class Blog(Base):
   __tablename__ = 'blogs'
@@ -7,3 +9,11 @@ class Blog(Base):
   id = Column(Integer, primary_key = True, index = True)
   title = Column(String)
   body = Column(String)
+  
+class User(Base):
+  __tablename__ = 'users'
+  
+  id = Column(Integer, primary_key = True, index = True)
+  name = Column(String)
+  email = Column(String)
+  password = Column(String)
