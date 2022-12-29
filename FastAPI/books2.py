@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, status, Form, Header
 from pydantic import BaseModel, Field
 from uuid import UUID
 from starlette.responses import JSONResponse
@@ -9,7 +9,6 @@ class NegativeNumberException(Exception):
     def __init__(self, books_to_return):
         self.books_to_return = books_to_return
         
-    
 
 app = FastAPI()
 
@@ -34,6 +33,18 @@ class Book(BaseModel):
                 "rating": 75
             }
         }
+        
+
+class BookNoRating(BaseModel):
+    id: UUID
+    title: str = Field(min_length=1)
+    author: str
+    description: Optional[str] = Field(
+        None, 
+        title="description of the Book", 
+        max_length=100,
+        min_length=1
+    )
 
 
 BOOKS = []
@@ -47,6 +58,23 @@ async def negative_number_exception_handler(request: Request,
         content={"message": f"Hey, why do you want{exception.books_to_return} "
                             f"books? You nedd to read more!"}
     )
+
+
+# @app.post("/books/login")
+# async def book_login(username: str = Form(), password: str = Form()):
+#     return {"username": username, "password": password}
+
+
+@app.post("/books/login/")
+async def book_login(book_id: int, username: Optional[str] = Header(None), password: Optional[str] = Header(None)):
+    if username == "FastAPIUser" and password == "test1234!":
+        return BOOKS[book_id]
+    return "Invalid User"
+
+
+@app.get("/header")
+async def read_header(random_header: Optional[str] = Header(None)):
+    return {"Random-Header": random_header}
 
 
 @app.get("/")
@@ -64,9 +92,8 @@ async def read_all_books(books_to_return: Optional[int] = None):
             new_books.append(BOOKS[i - 1])
             i += 1
         return new_books
+    
     return BOOKS
-
-
 
 
 @app.get("/book/{book_id}")
@@ -78,7 +105,15 @@ async def read_book(book_id: UUID):
     raise raise_item_cannot_be_found_exception()
 
 
-@app.post("/")
+@app.get("/book/rating/{book_id}", response_model=BookNoRating)
+async def read_book_no_rating(book_id: UUID):
+    for x in BOOKS:
+        if x.id == book_id:
+            return x
+    raise raise_item_cannot_be_found_exception()
+
+
+@app.post("/", status_code=status.HTTP_201_CREATED)
 async def create_book(book: Book):
     BOOKS.append(book)
     return book
@@ -143,3 +178,7 @@ def raise_item_cannot_be_found_exception():
                          headers={"X-Header_Error": 
                                   "Notiong to be seen at the UUID"})
     
+
+"""
+assignment
+"""
