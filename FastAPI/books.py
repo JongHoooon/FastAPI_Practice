@@ -61,6 +61,8 @@ async def delete_book_query(book_name: str):
     del BOOKS[book_name]
     return f"Book {book_name} deleted"
 
+
+
 '''
 class DirectionName(str, Enum):
     north = "North"
