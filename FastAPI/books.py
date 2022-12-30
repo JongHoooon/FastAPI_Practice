@@ -12,6 +12,7 @@ BOOKS = {
     "book_5": {"title": "Title Five", "author": "Author Five" },
 }
 
+
 @app.get("/")
 async def read_all_boocks(skip_book: Optional[str] = None):      # default 값 없으면 요청시 반드시 필요 / 옵셔널로 선언안하면
     if skip_book: 
@@ -20,9 +21,11 @@ async def read_all_boocks(skip_book: Optional[str] = None):      # default 값 �
         return new_books
     return BOOKS
 
+
 @app.get("/{book_name}")
 async def read_book(book_name: str):
     return BOOKS[book_name]
+
 
 @app.post("/")
 async def create_bool(book_title, book_author):
@@ -37,24 +40,29 @@ async def create_bool(book_title, book_author):
     BOOKS[f"book_{current_book_id + 1}"] = {"title": book_title, "author": book_author}
     return BOOKS
 
+
 @app.put("/{book_name}")
 async def update_book(book_name: str, book_title: str, book_author: str):
     book_information = {"title": book_title, "author": book_author}
     BOOKS[book_name] = book_information
     return book_information
 
+
 @app.delete("/{book_name}")
 async def delete_book(book_name): 
     del BOOKS[book_name]
     return f"Book {book_name} deleted"
 
+
 """
 assignment
 """
 
+
 @app.get("/assignment/")
 async def read_book_query(book_name: str):
     return BOOKS[book_name]
+
 
 @app.delete("/assignment/")
 async def delete_book_query(book_name: str):
